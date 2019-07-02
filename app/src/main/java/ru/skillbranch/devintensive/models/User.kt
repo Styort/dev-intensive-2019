@@ -3,34 +3,35 @@ package ru.skillbranch.devintensive.models
 import ru.skillbranch.devintensive.utils.Utils
 import java.util.*
 
-data class User constructor(val builder: Builder)
-{
-    val id : String
-    var firstName : String?
-    var lastName : String? = String()
-    var avatar : String?
-    var rating : Int = 0
-    var respect : Int = 0
-    var lastVisit : Date? = Date()
-    var isOnline : Boolean = false
+data class User(
+    val id: String,
+    var firstName: String?,
+    var lastName: String? = String(),
+    var avatar: String?,
+    var rating: Int = 0,
+    var respect: Int = 0,
+    var lastVisit: Date? = Date(),
+    var isOnline: Boolean = false
+) {
+
+    constructor(id: String, firstName: String?, lastName: String?) : this(
+        id = id,
+        firstName = firstName,
+        lastName = lastName,
+        avatar = null
+    )
+
+    constructor(id: String) : this(id, "Jonh", "Doe")
 
     init {
-        id = builder.id
-        firstName = builder.firstName
-        lastName = builder.lastName
-        avatar = builder.avatar
-        rating = builder.rating
-        respect = builder.respect
-        lastVisit = builder.lastVisit
-        isOnline = builder.isOnline
         println("User created. His name is $firstName $lastName")
     }
 
-    companion object Factory{
-        private var lastId : Int = -1
+    companion object Factory {
+        private var lastId: Int = -1
 
-        fun makeUser(fullName:String?) : User{
-            lastId ++
+        fun makeUser(fullName: String?): User {
+            lastId++
 
             val (firstName, lastName) = Utils.parseFullName(fullName)
 
@@ -39,14 +40,14 @@ data class User constructor(val builder: Builder)
     }
 
     class Builder {
-        var id : String = String()
-        var firstName : String?= String()
-        var lastName : String?= String()
-        var avatar : String?= String()
-        var rating : Int = 0
-        var respect : Int = 0
-        var lastVisit : Date? = Date()
-        var isOnline : Boolean = false
+        var id: String = String()
+        var firstName: String? = String()
+        var lastName: String? = String()
+        var avatar: String? = String()
+        var rating: Int = 0
+        var respect: Int = 0
+        var lastVisit: Date? = Date()
+        var isOnline: Boolean = false
 
 
         fun id(id: String) = apply { this.id = id }
@@ -57,6 +58,6 @@ data class User constructor(val builder: Builder)
         fun respect(respect: Int) = apply { this.respect = respect }
         fun lastVisit(lastVisit: Date?) = apply { this.lastVisit = lastVisit }
         fun isOnline(isOnline: Boolean) = apply { this.isOnline = isOnline }
-        fun build() = User(this)
+        fun build() = User(id, firstName, lastName, avatar, rating, respect, lastVisit, isOnline)
     }
 }
