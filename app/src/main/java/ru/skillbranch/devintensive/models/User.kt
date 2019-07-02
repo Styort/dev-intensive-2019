@@ -19,6 +19,10 @@ data class User private constructor(val builder: Builder)
         firstName = builder.firstName
         lastName = builder.lastName
         avatar = builder.avatar
+        rating = builder.rating
+        respect = builder.respect
+        lastVisit = builder.lastVisit
+        isOnline = builder.isOnline
         println("User created. His name is $firstName $lastName")
     }
 
