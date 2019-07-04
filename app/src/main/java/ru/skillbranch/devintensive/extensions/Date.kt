@@ -1,5 +1,6 @@
 package ru.skillbranch.devintensive.extensions
 
+import ru.skillbranch.devintensive.utils.Utils
 import java.lang.IllegalStateException
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -44,7 +45,17 @@ enum class TimeUnits {
     HOUR,
     DAY,
     MONTH,
-    YEAR
+    YEAR;
+
+    fun plural(value: Int): String = when(this)
+    {
+        SECOND -> secondsAsPlular(value)
+        MINUTE -> minutesAsPlular(value)
+        HOUR -> hoursAsPlular(value)
+        DAY ->  daysAsPlular(value)
+        MONTH ->  monthAsPlular(value)
+        YEAR ->  yearAsPlular(value)
+    }
 }
 
 fun Date.humanizeDiff(date: Date = Date()): String {
@@ -57,22 +68,22 @@ fun Date.humanizeDiff(date: Date = Date()): String {
     return when (diffInMillies) {
         in -45..-1 -> "несколько секунд назад"
         in -75..-45 -> "минуту назад"
-        in -45 * minute..-75 -> "${minutesAsPlular(abs(diffInMillies / 60))} назад"
+        in -45 * minute..-75 -> "${TimeUnits.MINUTE.plural(abs(diffInMillies / 60))} назад"
         in -75 * minute..-45 * minute -> "час назад"
-        in -22 * hour..-75 * minute -> "${hoursAsPlular(abs(diffInMillies / 60 / 60))} назад"
+        in -22 * hour..-75 * minute -> "${TimeUnits.HOUR.plural(abs(diffInMillies / 60 / 60))} назад"
         in -26 * hour..-22 * hour -> "день назад"
-        in -360 * day..-26 * hour -> "${daysAsPlular(abs(diffInMillies / 60 / 60 / 24))} назад"
+        in -360 * day..-26 * hour -> "${TimeUnits.DAY.plural(abs(diffInMillies / 60 / 60 / 24))} назад"
         in -Int.MAX_VALUE..-360 * day -> "более года назад"
 
         in -1..1 -> "только что"
 
         in 1..45 -> "через несколько секунд"
         in 45..75 -> "через минуту"
-        in 75..45 * minute -> "через ${minutesAsPlular(diffInMillies / 60)}"
+        in 75..45 * minute -> "через ${TimeUnits.MINUTE.plural(diffInMillies / 60)}"
         in 45 * minute..75 * minute -> "через час"
-        in 75 * minute..22 * hour -> "через ${hoursAsPlular(diffInMillies / 60 / 60)}"
+        in 75 * minute..22 * hour -> "через ${TimeUnits.HOUR.plural(diffInMillies / 60 / 60)}"
         in 22 * hour..26 * hour -> "через день"
-        in 26 * hour..360 * day -> "через ${daysAsPlular(diffInMillies / 60 / 60 / 24)}"
+        in 26 * hour..360 * day -> "через ${TimeUnits.DAY.plural(diffInMillies / 60 / 60 / 24)}"
         in 360 * day..Int.MAX_VALUE -> "более чем через год"
 
         else -> "более года назад"
@@ -91,6 +102,12 @@ private fun minutesAsPlular(value: Int) = when (value.asPlulars()) {
     Plular.MANY -> "$value минут"
 }
 
+private fun secondsAsPlular(value: Int) = when (value.asPlulars()) {
+    Plular.ONE -> "$value секунду"
+    Plular.FEW -> "$value секунды"
+    Plular.MANY -> "$value секунд"
+}
+
 private fun hoursAsPlular(value: Int) = when (value.asPlulars()) {
     Plular.ONE -> "$value час"
     Plular.FEW -> "$value часа"
@@ -103,9 +120,21 @@ private fun daysAsPlular(value: Int) = when (value.asPlulars()) {
     Plular.MANY -> "$value дней"
 }
 
+private fun monthAsPlular(value: Int) = when (value.asPlulars()) {
+    Plular.ONE -> "$value месяц"
+    Plular.FEW -> "$value месяца"
+    Plular.MANY -> "$value месяцев"
+}
+
+private fun yearAsPlular(value: Int) = when (value.asPlulars()) {
+    Plular.ONE -> "$value год"
+    Plular.FEW -> "$value года"
+    Plular.MANY -> "$value лет"
+}
+
 fun Int.asPlulars() : Plular{
     if (this > 10 && this % 100 / 10 == 1) return Plular.MANY
-    if (this == 0 || this == 1) return Plular.ONE
+    if (this == 1) return Plular.ONE
 
     return when (this % 10) {
         1 -> Plular.ONE
