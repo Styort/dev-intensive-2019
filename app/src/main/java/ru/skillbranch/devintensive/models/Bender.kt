@@ -35,11 +35,11 @@ class Bender(var status: Status = Status.NORMAL, var question: Question = Questi
     }
 
     fun Validation(answer: String) = when (question) {
-        Question.NAME -> if (answer[0].isLowerCase()) "Имя должно начинаться с заглавной буквы" else ""
-        Question.PROFESSION -> if (answer[0].isUpperCase()) "Профессия должна начинаться со строчной буквы" else ""
-        Question.MATERIAL -> if (answer.contains(Regex("\\d"))) "Материал не должен содержать цифр" else ""
-        Question.BDAY -> if (!answer.isDigitsOnly()) "Год моего рождения должен содержать только цифры" else ""
-        Question.SERIAL -> if (!answer.isDigitsOnly() && answer.length != 7) "Серийный номер содержит только цифры, и их 7" else ""
+        Question.NAME -> if (answer.isBlank() || answer[0].isLowerCase()) "Имя должно начинаться с заглавной буквы" else ""
+        Question.PROFESSION -> if (answer.isBlank() ||answer[0].isUpperCase()) "Профессия должна начинаться со строчной буквы" else ""
+        Question.MATERIAL -> if (answer.isBlank() ||answer.contains(Regex("\\d"))) "Материал не должен содержать цифр" else ""
+        Question.BDAY -> if (answer.isBlank() || !answer.isDigitsOnly()) "Год моего рождения должен содержать только цифры" else ""
+        Question.SERIAL -> if (answer.isBlank() || !answer.isDigitsOnly() && answer.length != 7) "Серийный номер содержит только цифры, и их 7" else ""
         else -> ""
     }
 
@@ -70,7 +70,7 @@ class Bender(var status: Status = Status.NORMAL, var question: Question = Questi
         MATERIAL("Из чего я сделан?", listOf("металл", "дерево", "metal", "wood", "iron")) {
             override fun nextQuestion(): Question = BDAY
         },
-        BDAY("Когда меня сделали?", listOf("2993")) {
+        BDAY("Когда меня создали?", listOf("2993")) {
             override fun nextQuestion(): Question = SERIAL
         },
         SERIAL("Мой серийный номер?", listOf("2716057")) {
