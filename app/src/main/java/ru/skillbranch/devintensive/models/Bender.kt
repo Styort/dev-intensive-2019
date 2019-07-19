@@ -35,6 +35,7 @@ class Bender(var status: Status = Status.NORMAL, var question: Question = Questi
                 {
                     errorCount = 0
                     question = Question.NAME
+                    status = Status.NORMAL
                     return "Это неправильный ответ. Давай все по новой\n${question.question}" to status.color
                 }
 
