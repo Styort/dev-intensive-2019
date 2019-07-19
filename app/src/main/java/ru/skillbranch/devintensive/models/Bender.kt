@@ -13,6 +13,8 @@ class Bender(var status: Status = Status.NORMAL, var question: Question = Questi
         Question.IDLE -> Question.IDLE.question
     }
 
+    var errorCount: Int = 0
+
     fun listenAnswer(answer: String): Pair<String, Triple<Int, Int, Int>> {
 
         val validationResult = Validation(answer)
@@ -22,13 +24,21 @@ class Bender(var status: Status = Status.NORMAL, var question: Question = Questi
                 question = question.nextQuestion()
                 "Отлично - ты справился\n${question.question}" to status.color
             } else {
+                if (question == Question.IDLE)
+                    return question.question to status.color
+
                 status = status.nextStatus()
 
-                when(question){
-                    Question.NAME -> "Это неправильный ответ. Давай все по новой\n${question.question}" to status.color
-                    Question.IDLE -> "${question.question}" to status.color
-                    else -> "Это неправильный ответ!\n${question.question}" to status.color
+                errorCount++
+
+                if (errorCount > 3)
+                {
+                    errorCount = 0
+                    question = Question.NAME
+                    return "Это неправильный ответ. Давай все по новой\n${question.question}" to status.color
                 }
+
+                return "Это неправильный ответ!\n${question.question}" to status.color
             }
         }
         return "$validationResult\n${question.question}" to status.color
@@ -36,10 +46,10 @@ class Bender(var status: Status = Status.NORMAL, var question: Question = Questi
 
     fun Validation(answer: String) = when (question) {
         Question.NAME -> if (answer.isBlank() || answer[0].isLowerCase()) "Имя должно начинаться с заглавной буквы" else ""
-        Question.PROFESSION -> if (answer.isBlank() ||answer[0].isUpperCase()) "Профессия должна начинаться со строчной буквы" else ""
-        Question.MATERIAL -> if (answer.isBlank() ||answer.contains(Regex("\\d"))) "Материал не должен содержать цифр" else ""
+        Question.PROFESSION -> if (answer.isBlank() || answer[0].isUpperCase()) "Профессия должна начинаться со строчной буквы" else ""
+        Question.MATERIAL -> if (answer.isBlank() || answer.contains(Regex("\\d"))) "Материал не должен содержать цифр" else ""
         Question.BDAY -> if (answer.isBlank() || !answer.isDigitsOnly()) "Год моего рождения должен содержать только цифры" else ""
-        Question.SERIAL -> if (answer.isBlank() || !answer.isDigitsOnly() && answer.length != 7) "Серийный номер содержит только цифры, и их 7" else ""
+        Question.SERIAL -> if (answer.isBlank() || !answer.isDigitsOnly() || answer.length != 7) "Серийный номер содержит только цифры, и их 7" else ""
         else -> ""
     }
 
