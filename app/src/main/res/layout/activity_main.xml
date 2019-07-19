@@ -36,7 +36,7 @@
             android:layout_marginTop="@dimen/spacing_normal_16">
 
         <EditText
-                android:id="@+id/еt_message"
+                android:id="@+id/et_message"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"

@@ -32,7 +32,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
         benderImage = iv_bender
         textTxt = tv_text
-        messageEt = еt_message
+        messageEt = et_message
         sendBtn = iv_send
 
         val status = savedInstanceState?.getString("STATUS") ?: Bender.Status.NORMAL.name
