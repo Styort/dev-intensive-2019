@@ -44,7 +44,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         val (r,g,b) = bender.status.color
         benderImage.setColorFilter(Color.rgb(r,g,b), PorterDuff.Mode.MULTIPLY)
 
-        textTxt.text = bender.askQuestion()
+        var questionString = bender.askQuestion()
+
+        textTxt.text = questionString
         sendBtn.setOnClickListener(this)
         messageEt.onClickKeyboardDoneButton{
             sendMessageToBender()

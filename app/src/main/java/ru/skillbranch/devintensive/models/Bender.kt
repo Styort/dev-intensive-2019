@@ -6,14 +6,13 @@ class Bender(var status: Status = Status.NORMAL, var question: Question = Questi
 
     fun askQuestion(): String = when (question) {
         Question.NAME -> Question.NAME.question
+        Question.RETRY -> Question.RETRY.question
         Question.PROFESSION -> Question.PROFESSION.question
         Question.MATERIAL -> Question.MATERIAL.question
         Question.BDAY -> Question.BDAY.question
         Question.SERIAL -> Question.SERIAL.question
         Question.IDLE -> Question.IDLE.question
     }
-
-    var errorCount: Int = 0
 
     fun listenAnswer(answer: String): Pair<String, Triple<Int, Int, Int>> {
 
@@ -27,17 +26,16 @@ class Bender(var status: Status = Status.NORMAL, var question: Question = Questi
                 if (question == Question.IDLE)
                     return question.question to status.color
 
+                if(status == Status.CRITICAL){
+                    question = Question.RETRY
+                    status = Status.NORMAL
+                    return question.question to status.color
+                }
+
                 status = status.nextStatus()
 
-                errorCount++
-
-                if (errorCount > 3)
-                {
-                    errorCount = 0
+                if(question == Question.RETRY)
                     question = Question.NAME
-                    status = Status.NORMAL
-                    return "Это неправильный ответ. Давай все по новой\n${question.question}" to status.color
-                }
 
                 return "Это неправильный ответ\n${question.question}" to status.color
             }
@@ -47,6 +45,7 @@ class Bender(var status: Status = Status.NORMAL, var question: Question = Questi
 
     fun Validation(answer: String) = when (question) {
         Question.NAME -> if (answer.isBlank() || answer[0].isLowerCase()) "Имя должно начинаться с заглавной буквы" else ""
+        Question.RETRY -> if (answer.isBlank() || answer[0].isLowerCase()) "Имя должно начинаться с заглавной буквы" else ""
         Question.PROFESSION -> if (answer.isBlank() || answer[0].isUpperCase()) "Профессия должна начинаться со строчной буквы" else ""
         Question.MATERIAL -> if (answer.isBlank() || answer.contains(Regex("\\d"))) "Материал не должен содержать цифр" else ""
         Question.BDAY -> if (answer.isBlank() || !answer.isDigitsOnly()) "Год моего рождения должен содержать только цифры" else ""
@@ -72,6 +71,9 @@ class Bender(var status: Status = Status.NORMAL, var question: Question = Questi
     }
 
     enum class Question(val question: String, val answer: List<String>) {
+        RETRY("Это неправильный ответ. Давай все по новой\nКак меня зовут?", listOf("бендер", "bender")) {
+            override fun nextQuestion(): Question = PROFESSION
+        },
         NAME("Как меня зовут?", listOf("бендер", "bender")) {
             override fun nextQuestion(): Question = PROFESSION
         },
