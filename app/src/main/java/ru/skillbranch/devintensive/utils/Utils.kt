@@ -1,5 +1,7 @@
 package ru.skillbranch.devintensive.utils
 
+import android.content.Context
+
 object Utils {
     fun parseFullName(fullName: String?): Pair<String?, String?> {
         val parts: List<String>? = fullName?.split(" ")
@@ -31,6 +33,8 @@ object Utils {
             if(symbol == ' ') result += divider
             if(translitMap.containsKey(symbol))
                 result += translitMap[symbol]
+            else
+                result += symbol
         }
 
         return result
@@ -103,4 +107,18 @@ object Utils {
         'Ю' to "Yu",
         'Я' to "Ya"
         )
+
+    fun convertPxToDp(context: Context, px: Int): Int {
+        val scale = context.resources.displayMetrics.density
+        return (px / scale + 0.5f).toInt()
+    }
+
+    fun convertDpToPx(context: Context, dp: Int): Int {
+        val scale = context.resources.displayMetrics.density
+        return (dp * scale + 0.5f).toInt()
+    }
+
+    fun convertSpToPx(context: Context, sp: Int): Int {
+        return sp * context.resources.displayMetrics.scaledDensity.toInt()
+    }
 }
