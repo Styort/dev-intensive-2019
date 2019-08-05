@@ -29,8 +29,11 @@ object Utils {
     fun transliteration(payload: String, divider: String = " "): String {
         var result = String()
 
-        for (symbol in payload){
-            if(symbol == ' ') result += divider
+        for (symbol in payload.trim()){
+            if(symbol == ' ') {
+                result += divider
+                continue
+            }
             if(translitMap.containsKey(symbol))
                 result += translitMap[symbol]
             else
