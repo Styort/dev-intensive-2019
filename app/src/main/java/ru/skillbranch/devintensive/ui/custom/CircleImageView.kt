@@ -70,6 +70,7 @@ class CircleImageView @JvmOverloads constructor(
             bitmap = getStrokedBitmap(bitmap, borderWidth, borderColor)
 
         canvas.drawBitmap(bitmap, 0F, 0F, null)
+        super.setImageBitmap(bitmap)
     }
 
     fun generateAvatar(text: String?, sizeSp: Int, theme: Resources.Theme){
