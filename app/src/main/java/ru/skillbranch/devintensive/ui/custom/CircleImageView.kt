@@ -1,34 +1,33 @@
 package ru.skillbranch.devintensive.ui.custom
 
 import android.content.Context
-import android.content.res.Resources
 import android.graphics.*
 import android.graphics.Bitmap.Config
 import android.graphics.PorterDuff.Mode
 import android.graphics.drawable.BitmapDrawable
 import android.util.AttributeSet
-import android.util.TypedValue
 import android.widget.ImageView
 import androidx.annotation.ColorRes
 import androidx.core.content.ContextCompat
 import ru.skillbranch.devintensive.App
-import ru.skillbranch.devintensive.R
 import ru.skillbranch.devintensive.utils.Utils
 import kotlin.math.min
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
+import ru.skillbranch.devintensive.R
 
-class CircleImageView @JvmOverloads constructor(
+
+class CircleImageView @JvmOverloads constructor (
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
-) : ImageView(context, attrs, defStyleAttr) {
+): ImageView(context, attrs, defStyleAttr) {
     companion object {
         private const val DEFAULT_BORDER_COLOR: Int = Color.WHITE
     }
 
     private var borderColor = DEFAULT_BORDER_COLOR
     private var borderWidth = Utils.convertDpToPx(context, 2)
-    private var text: String? = null
-    private var bitmap: Bitmap? = null
 
     init {
         if (attrs != null) {
@@ -70,56 +69,6 @@ class CircleImageView @JvmOverloads constructor(
             bitmap = getStrokedBitmap(bitmap, borderWidth, borderColor)
 
         canvas.drawBitmap(bitmap, 0F, 0F, null)
-        super.setImageBitmap(bitmap)
-    }
-
-    fun generateAvatar(text: String?, sizeSp: Int, theme: Resources.Theme){
-        /* don't render if initials haven't changed */
-        if (bitmap == null || text != this.text){
-            val image =
-                if (text == null) {
-                    generateDefAvatar(theme)
-                }
-                else generateLetterAvatar(text, sizeSp, theme)
-
-            this.text = text
-            bitmap = image
-            //setImageBitmap(bitmap)
-            invalidate()
-        }
-    }
-
-    private fun generateLetterAvatar(text: String, sizeSp: Int, theme: Resources.Theme): Bitmap {
-        val image = generateDefAvatar(theme)
-
-        val paint = Paint(Paint.ANTI_ALIAS_FLAG)
-        paint.textSize = sizeSp.toFloat()
-        paint.color = Color.WHITE
-        paint.textAlign = Paint.Align.CENTER
-
-        val textBounds = Rect()
-        paint.getTextBounds(text, 0, text.length, textBounds)
-
-        val backgroundBounds = RectF()
-        backgroundBounds.set(0f, 0f, layoutParams.height.toFloat(), layoutParams.height.toFloat())
-
-        val textBottom = backgroundBounds.centerY() - textBounds.exactCenterY()
-        val canvas = Canvas(image)
-        canvas.drawText(text, backgroundBounds.centerX(), textBottom, paint)
-
-        return image
-    }
-
-    private fun generateDefAvatar(theme: Resources.Theme): Bitmap {
-        val image = Bitmap.createBitmap(layoutParams.height, layoutParams.height, Config.ARGB_8888)
-        val color = TypedValue()
-        theme.resolveAttribute(R.attr.colorAccent, color, true)
-
-
-        val canvas = Canvas(image)
-        canvas.drawColor(color.data)
-
-        return image
     }
 
     private fun getStrokedBitmap(squareBmp: Bitmap, strokeWidth: Int, color: Int): Bitmap {
@@ -156,20 +105,33 @@ class CircleImageView @JvmOverloads constructor(
     }
 
     private fun getBitmapFromDrawable(): Bitmap? {
-        if (bitmap != null)
-            return bitmap
-
         if (drawable == null)
             return null
 
         if (drawable is BitmapDrawable)
             return (drawable as BitmapDrawable).bitmap
 
-        val bitmap = Bitmap.createBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight, Config.ARGB_8888)
+        return drawableToBitmap(drawable)
+    }
+
+    fun drawableToBitmap(drawable: Drawable): Bitmap? {
+        var bitmap: Bitmap? = null
+
+        if (drawable is BitmapDrawable) {
+            if (drawable.bitmap != null) {
+                return drawable.bitmap
+            }
+        }
+
+        bitmap = if(drawable.intrinsicWidth <= 0 || drawable.intrinsicHeight <= 0) {
+            Bitmap.createBitmap(1, 1, Config.ARGB_8888); // Single color bitmap will be created of 1x1 pixel
+        } else {
+            Bitmap.createBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight, Config.ARGB_8888);
+        }
+
         val canvas = Canvas(bitmap)
         drawable.setBounds(0, 0, canvas.width, canvas.height)
         drawable.draw(canvas)
-
         return bitmap
     }
 
@@ -179,16 +141,13 @@ class CircleImageView @JvmOverloads constructor(
         val canvas = Canvas(outputBmp)
 
         val paint = Paint()
-        val rect = Rect(0, 0, smallest, smallest)
 
         paint.isAntiAlias = true
         paint.isFilterBitmap = true
         paint.isDither = true
-        canvas.drawARGB(0, 0, 0, 0)
         canvas.drawCircle(smallest / 2F, smallest / 2F, smallest / 2F, paint)
-
         paint.xfermode = PorterDuffXfermode(Mode.SRC_IN)
-        canvas.drawBitmap(bitmap, rect, rect, paint)
+        canvas.drawBitmap(bitmap, 0F, 0F,  paint)
 
         return outputBmp
     }

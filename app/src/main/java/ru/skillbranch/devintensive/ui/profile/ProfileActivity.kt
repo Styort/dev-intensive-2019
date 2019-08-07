@@ -14,9 +14,10 @@ import ru.skillbranch.devintensive.viewmodels.ProfileViewModel
 import android.graphics.*
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.TypedValue
 import android.widget.ImageView
 import ru.skillbranch.devintensive.R
-import ru.skillbranch.devintensive.utils.TextDrawable
+import ru.skillbranch.devintensive.ui.custom.TextDrawable
 import ru.skillbranch.devintensive.utils.Utils
 
 
@@ -153,7 +154,12 @@ class ProfileActivity : AppCompatActivity() {
 
     private fun updateAvatar(profile: Profile) {
         val initials = Utils.toInitials(profile.firstName, profile.lastName)
-        iv_avatar.generateAvatar(initials, Utils.convertSpToPx(this, 48), theme)
+        val color = TypedValue()
+        theme.resolveAttribute(R.attr.colorAccent, color, true)
+        if(initials.isNullOrEmpty())
+            iv_avatar.setImageResource(R.drawable.avatar_default)
+        else
+            iv_avatar.setImageDrawable(TextDrawable.builder().beginConfig().textColor(Color.WHITE).height(112).width(112).endConfig().buildRound(initials, color.data))
     }
 
     private fun saveProfileInfo(){

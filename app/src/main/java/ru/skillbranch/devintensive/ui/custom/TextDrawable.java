@@ -1,4 +1,4 @@
-package ru.skillbranch.devintensive.utils;
+package ru.skillbranch.devintensive.ui.custom;
 
 import android.graphics.*;
 import android.graphics.drawable.ShapeDrawable;
